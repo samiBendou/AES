@@ -39,7 +39,6 @@
 
 
 #include <NVector.h>
-#include <AESByte.h>
 
 using namespace std;
 

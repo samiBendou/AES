@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <cmath>
 #include <vector>
 #include <cstdarg>
@@ -32,6 +33,8 @@
 #include <algorithm>
 #include <complex>
 #include <functional>
+
+#include <AESByte.h>
 
 #define MAX_SIZE 4294967295
 #define EPSILON (std::numeric_limits<T>::epsilon())

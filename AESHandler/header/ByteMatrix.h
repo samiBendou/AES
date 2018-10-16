@@ -5,11 +5,10 @@
 #ifndef AES_BYTEMATRIX_H
 #define AES_BYTEMATRIX_H
 
+#include <NVector.h>
 #include <NPMatrix.h>
 #include <AESByte.h>
 
-template
-class NPMatrix<AESByte>;
 
 class ByteMatrix : public NPMatrix<AESByte> {
 

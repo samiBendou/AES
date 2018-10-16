@@ -39,16 +39,16 @@ NVector<T>::NVector(const std::string &str) :
 
 template<typename T>
 string NVector<T>::str() const {
-    string str = "(";
-    char buffer[6];
+    stringstream stream;
+
+    stream << '(';
     for (auto k = _k1; k <= _k2; ++k) {
-        sprintf(buffer, "%.2e", abs((*this)[k]));
-        str += ((*this)[k] >= 0 ? "  " : " -");
-        str += buffer;
+        stream << ((*this)[k] >= 0 ? ' ' : '-');
+        stream << (*this)[k];
     }
-    str += "  )";
+    stream << " )";
     setDefaultBrowseIndices();
-    return str;
+    return stream.str();
 }
 
 // GETTERS
@@ -339,12 +339,12 @@ bool operator!=(const NVector<T> &u, T s) { return !(u == s); }
 
 template<typename T>
 NVector<T> NVector<T>::zeros(ul_t dim) {
-    return scalar(0.0, dim);
+    return scalar(0, dim);
 }
 
 template<typename T>
 NVector<T> NVector<T>::ones(ul_t dim) {
-    return scalar(1.0, dim);
+    return scalar(1, dim);
 }
 
 template<typename T>
@@ -574,6 +574,8 @@ class NVector<double>;
 template
 class NVector<char>;
 
+template
+class NVector<AESByte>;
 
 
 
