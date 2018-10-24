@@ -47,10 +47,9 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
                                               0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
                                       }));
 
-    mat_mix_columns = " (2 3 1 1) \
-                        (1 2 3 1) \
-                        (1 1 2 3) \
-                        (3 1 1 2)";
+    mat_mix_columns = mat_aes_t(std::vector<AESByte> {0x02, 0x03, 0x01, 0x01,
+                                                      0x01, 0x02, 0x03, 0x01,
+                                                      0x03, 0x01, 0x01, 0x02}, 4,  4);
 
     r_con = mat_aes_t(std::vector<AESByte> {0x01, 0x00, 0x00, 0x00,
                                             0x02, 0x00, 0x00, 0x00,
@@ -61,7 +60,7 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
                                             0x40, 0x00, 0x00, 0x00,
                                             0x80, 0x00, 0x00, 0x00,
                                             0x1b, 0x00, 0x00, 0x00,
-                                            0x36, 0x00, 0x00, 0x00}, 4, 10);
+                                            0x36, 0x00, 0x00, 0x00}, 10, 4);
 }
 
 mat_aes_t AESHandler::encrypt(const mat_aes_t &plain, const mat_aes_t &key) {
@@ -70,20 +69,16 @@ mat_aes_t AESHandler::encrypt(const mat_aes_t &plain, const mat_aes_t &key) {
     _round_key = key;
     addRoundKey();
 
-    _round = 0;
-    for (_round = 0; _round < _n_r; ++_round) {
+    _round = 1;
+    while (_round <= _n_r) {
         subBytes(_state);
-        cout << _state << endl;
-
         shiftRows();
-        cout << _state << endl;
 
-        if (_round != _n_r - 1) {
+        if (_round <= _n_r - 1) {
             mixColumns();
-            cout << _state << endl;
         }
         addRoundKey();
-        cout << _state << endl;
+        ++_round;
     }
 
     return _state;
@@ -124,31 +119,15 @@ void AESHandler::mixColumns() {
 void AESHandler::keyExpansion() {
     vec_aes_t round_key_col{_round_key.col(_n_k - 1)};
 
-    cout << "Round Key 1 : " <<_round_key << endl;
-
-    cout << "Col 0 : " <<round_key_col << endl;
-
     round_key_col.shift(1);
-
-    cout << "Col 1 : " <<round_key_col << endl;
-
     subBytes(round_key_col);
-
-    cout << "Col 2 : " <<round_key_col << endl;
-
-    round_key_col += _round_key.col(0) + r_con.col(_round);
-
+    round_key_col += _round_key.col(0) + r_con.row(_round);
     _round_key.setCol(round_key_col, 0);
-
-    cout << "Round Key 2 : " <<_round_key << endl;
-
 
     for (uc_t j = 1; j < _n_k; ++j) {
         round_key_col = _round_key.col(j - 1) + _round_key.col(j);
         _round_key.setCol(round_key_col, j);
     }
-
-    cout << "Round Key 3 : " <<_round_key << endl;
 }
 
 
