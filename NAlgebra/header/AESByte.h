@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-typedef unsigned long uc_t;
+typedef unsigned char uc_t;
 
 typedef unsigned int ui_t;
 
@@ -26,6 +26,8 @@ public:
     AESByte(int val);
 
     AESByte(double val);
+
+    uc_t val() const;
 
     AESByte operator+(const AESByte& b);
 

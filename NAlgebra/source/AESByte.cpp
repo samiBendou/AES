@@ -18,12 +18,16 @@ AESByte::AESByte(double val) : _val(((uc_t) floor(fabs(val))) % 256){
 
 }
 
+uc_t AESByte::val() const {
+    return _val;
+}
+
 void AESByte::xtime() {
-    _val = (_val & (char) 0x80) ? ((_val << 1) ^ (char) 0x1b) : (_val << 1);
+    _val = (_val & (uc_t) 0x80) ? ((_val << 1) ^ (uc_t) 0x1b) : (_val << 1);
 }
 
 void AESByte::add(const AESByte &b) {
-    this->_val ^= b._val;
+    _val ^= b._val;
 }
 
 void AESByte::prod(const AESByte &b) {
@@ -116,8 +120,9 @@ AESByte abs(const AESByte &b) {
 }
 
 AESByte sqrt(const AESByte &b) {
-    return AESByte(sqrt(b._val));
+    return {sqrt(b._val)};
 }
+
 
 
 
