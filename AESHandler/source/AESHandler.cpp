@@ -49,6 +49,7 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
 
     mat_mix_columns = mat_aes_t(std::vector<AESByte> {0x02, 0x03, 0x01, 0x01,
                                                       0x01, 0x02, 0x03, 0x01,
+                                                      0x01, 0x01, 0x02, 0x03,
                                                       0x03, 0x01, 0x01, 0x02}, 4,  4);
 
     r_con = mat_aes_t(std::vector<AESByte> {0x01, 0x00, 0x00, 0x00,
