@@ -10,10 +10,6 @@
 #define MAX_N_R 14
 #define N_ROWS_STATE 4
 
-typedef NPMatrix<AESByte> mat_aes_t;
-
-typedef NVector<AESByte> vec_aes_t;
-
 class AESHandler {
 public:
 
