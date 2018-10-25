@@ -66,10 +66,6 @@ protected:
 
     uc_t _n_r;
 
-    // STATIC FUNCTIONS
-
-    static mat_aes_t RCon();
-
     // STATIC CONSTANT
 
     const static vec_aes_t s_box;

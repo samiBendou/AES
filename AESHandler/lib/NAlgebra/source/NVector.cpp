@@ -10,14 +10,20 @@ using namespace std;
 // CONSTRUCTORS
 
 template<typename T>
-NVector<T>::NVector(ul_t dim) :
-        vector<T>(dim), _k1(0), _k2(0) {
+NVector<T>::NVector(const std::vector<T> &data) :
+        vector<T>(data), _k1(0), _k2(0) {
     setDefaultBrowseIndices();
 }
 
 template<typename T>
-NVector<T>::NVector(const std::vector<T> &data) :
-        vector<T>(data), _k1(0), _k2(0) {
+NVector<T>::NVector(initializer_list<T> list) :
+        vector<T>(list), _k1(0), _k2(0) {
+    setDefaultBrowseIndices();
+}
+
+template<typename T>
+NVector<T>::NVector(ul_t dim) :
+        vector<T>(dim), _k1(0), _k2(0) {
     setDefaultBrowseIndices();
 }
 
@@ -26,14 +32,6 @@ NVector<T>::NVector(const NVector<T> &u) :
         vector<T>(0), _k1(0), _k2(0) {
     copy(u);
 }
-
-template<typename T>
-NVector<T>::NVector(const std::string &str) :
-        std::vector<T>(0), _k1(0), _k2(0) {
-    parse(str);
-    setDefaultBrowseIndices();
-}
-
 
 // SERIALIZATION
 
@@ -44,7 +42,7 @@ string NVector<T>::str() const {
     stream << '(';
     for (auto k = _k1; k <= _k2; ++k) {
         stream << ((*this)[k] >= 0 ? ' ' : '-');
-        stream << (*this)[k];
+        stream << abs((*this)[k]);
     }
     stream << " )";
     setDefaultBrowseIndices();
@@ -302,12 +300,6 @@ NVector<T> &NVector<T>::operator=(const NVector<T> &u) {
     return *this;
 }
 
-template<typename T>
-NVector<T> &NVector<T>::operator=(const std::string &str) {
-    parse(str);
-    return *this;
-}
-
 // NORM BASED COMPARISON OPERATORS
 
 template<typename T>
@@ -349,7 +341,7 @@ NVector<T> NVector<T>::ones(ul_t dim) {
 
 template<typename T>
 NVector<T> NVector<T>::scalar(T s, ul_t dim) {
-    NVector<T> scalar{dim};
+    NVector<T> scalar(dim);
     scalar.fill(s);
     return scalar;
 }
@@ -522,27 +514,6 @@ void NVector<T>::copy(const NVector<T> &u) {
     }
 }
 
-template<typename T>
-void NVector<T>::parse(const std::string &str) {
-    vector<T> data{};
-    string::size_type sz = 1;
-    ul_t i = 0;
-
-    assert(str.find(',') == string::npos);
-
-    while (i < str.size() && str[i] != ')') {
-        try {
-            data.push_back(std::stod(str.substr(i, str.size() - i), &sz));
-            i += sz;
-        }
-        catch (const std::exception &e) {
-            i++;
-        }
-    }
-
-    this->copy(NVector(data));
-}
-
 // SUB-VECTORS
 
 template<typename T>
@@ -567,6 +538,8 @@ void NVector<T>::setSubVector(const NVector<T> &u) {
     setDefaultBrowseIndices();
     u.setDefaultBrowseIndices();
 }
+
+
 
 template
 class NVector<double>;
