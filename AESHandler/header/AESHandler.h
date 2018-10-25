@@ -22,7 +22,7 @@ public :
 
     void addRoundKey();
 
-    void subBytes(vec_aes_t &block_col);
+    void subWord(vec_aes_t &block_col);
 
     void subBytes(mat_aes_t &block);
 
@@ -30,7 +30,9 @@ public :
 
     void mixColumns();
 
-    void keyExpansion();
+    void keyExpansion(const mat_aes_t &key);
+
+    void initRCon();
 
     mat_aes_t _state;
 

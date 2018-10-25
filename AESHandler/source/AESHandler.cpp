@@ -12,6 +12,7 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
                                                         _n_b(n_b), _n_k(n_k), _n_r(n_r)
 
     {
+
     s_box = vec_aes_t(vector<AESByte>({
                                               0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
                                               0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -52,6 +53,10 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
                                                       0x01, 0x01, 0x02, 0x03,
                                                       0x03, 0x01, 0x01, 0x02}, 4,  4);
 
+
+    initRCon();
+
+    /*
     r_con = mat_aes_t(std::vector<AESByte> {0x01, 0x00, 0x00, 0x00,
                                             0x02, 0x00, 0x00, 0x00,
                                             0x04, 0x00, 0x00, 0x00,
@@ -61,24 +66,39 @@ AESHandler::AESHandler(uc_t n_b, uc_t n_k, uc_t n_r) :  _state(mat_aes_t()), _ro
                                             0x40, 0x00, 0x00, 0x00,
                                             0x80, 0x00, 0x00, 0x00,
                                             0x1b, 0x00, 0x00, 0x00,
-                                            0x36, 0x00, 0x00, 0x00}, 10, 4);
+                                            0x36, 0x00, 0x00, 0x00}, _n_r, 4);*/
 }
 
 mat_aes_t AESHandler::encrypt(const mat_aes_t &plain, const mat_aes_t &key) {
 
+    assert(plain.n() == 4 && plain.p() == _n_b);
+    assert(key.n() == 4 && key.p() == _n_k);
+
+    keyExpansion(key);
+
     _state = plain;
-    _round_key = key;
+
     addRoundKey();
 
     _round = 1;
+
     while (_round <= _n_r) {
+        cout << "*ROUND " << (int) _round << "*" << endl;
+
+        cout << "round key : " << endl << _round_key << endl;
+
         subBytes(_state);
+        cout << "subbytes :" << endl << _state << endl;
+
         shiftRows();
+        cout << "shiftRows :" << endl << _state << endl;
 
         if (_round <= _n_r - 1) {
             mixColumns();
+            cout << "mixColumns :" << endl << _state << endl;
         }
         addRoundKey();
+        cout << "addRoundKey :" << endl << _state << endl;
         ++_round;
     }
 
@@ -86,21 +106,18 @@ mat_aes_t AESHandler::encrypt(const mat_aes_t &plain, const mat_aes_t &key) {
 }
 
 void AESHandler::addRoundKey() {
-    _state += _round_key;
-    if(_round != _n_r) {
-        keyExpansion();
-    }
+    _state += _round_key(0, _n_b * _round, 3, _n_b * (_round + 1) - 1);
 }
 
 
-void AESHandler::subBytes(vec_aes_t &block_col) {
-    for (uc_t k = 0; k < _n_b; ++k) {
+void AESHandler::subWord(vec_aes_t &block_col) {
+    for (uc_t k = 0; k < 4; ++k) {
         block_col(k) = s_box(block_col(k).val());
     }
 }
 
 void AESHandler::subBytes(mat_aes_t &block) {
-    for (uc_t i = 0; i < _n_b; ++i) {
+    for (uc_t i = 0; i < 4; ++i) {
         for (uc_t j = 0; j < _n_b; ++j) {
             block(i, j) = s_box(block(i, j).val());
         }
@@ -108,7 +125,7 @@ void AESHandler::subBytes(mat_aes_t &block) {
 }
 
 void AESHandler::shiftRows() {
-    for (uc_t i = 0; i < _n_b; ++i) {
+    for (uc_t i = 0; i < 4; ++i) {
         _state.shiftRow(i, i);
     }
 }
@@ -117,17 +134,67 @@ void AESHandler::mixColumns() {
     _state = mat_mix_columns * _state;
 }
 
-void AESHandler::keyExpansion() {
-    vec_aes_t round_key_col{_round_key.col(_n_k - 1)};
+void AESHandler::keyExpansion(const mat_aes_t &key) {
+
+
+    _round_key = mat_aes_t::zeros(4, _n_b * (_n_r + 1));
+    _round_key(0, 0, 3, _n_k - 1) = key;
+
+    vec_aes_t round_key_col;
+
+    for (uc_t k = _n_k; k < _n_b * (_n_r + 1); ++k) {
+        round_key_col = _round_key.col(k - 1);
+        if(k % _n_k == 0) {
+            round_key_col.shift(1);
+            subWord(round_key_col);
+            round_key_col += r_con.col(k / _n_k - 1);
+        }
+        else if (_n_k > 6 && k % _n_k == 4) {
+            subWord(round_key_col);
+        }
+        round_key_col = _round_key.col(k - _n_k) + round_key_col;
+        _round_key.setCol(round_key_col, k);
+    }
+
+    /*
+    cout << "key expansion :" << endl;
+
+    cout << round_key_col << endl;
 
     round_key_col.shift(1);
-    subBytes(round_key_col);
-    round_key_col += _round_key.col(0) + r_con.row(_round);
+
+    cout << round_key_col << endl;
+
+    subWord(round_key_col);
+
+    cout << round_key_col << endl;
+
+    round_key_col += _round_key.col(0) + r_con.col(_round);
+
+    cout << round_key_col << endl;
+
     _round_key.setCol(round_key_col, 0);
 
     for (uc_t j = 1; j < _n_k; ++j) {
+        if (_n_k > 6 && j % _n_k == 4) {
+            subWord(round_key_col);
+        }
         round_key_col = _round_key.col(j - 1) + _round_key.col(j);
         _round_key.setCol(round_key_col, j);
+    }
+     */
+}
+
+void AESHandler::initRCon() {
+
+    vec_aes_t r_con_col = vec_aes_t::zeros(4);
+    r_con = mat_aes_t(4, _n_r);
+
+    r_con_col(0) = 0x01;
+    r_con.setCol(r_con_col, 0);
+    for (uc_t k = 1; k < _n_r; ++k) {
+        r_con_col(0) = r_con_col(0) * 0x02;
+        r_con.setCol(r_con_col, k);
     }
 }
 
