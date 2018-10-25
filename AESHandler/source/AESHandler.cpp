@@ -254,12 +254,12 @@ void AESHandler::keyExpansion(const mat_aes_t &key) {
 
 
     _round_key = mat_aes_t::zeros(N_ROWS_STATE, _n_b * (_n_r + 1));
-    _round_key(0, 0, 3, static_cast<ul_t>(_n_k - 1)) = key;
+    _round_key(0, 0, 3, _n_k - 1) = key;
 
     vec_aes_t round_key_col;
 
     for (uc_t k = _n_k; k < _n_b * (_n_r + 1); ++k) {
-        round_key_col = _round_key.col(static_cast<ul_t>(k - 1));
+        round_key_col = _round_key.col(k - 1);
         if (k % _n_k == 0) {
             rotWord(round_key_col);
             subWord(round_key_col);
