@@ -60,7 +60,6 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const AESByte& b);
 
 private:
-    void xtime();
 
     void add(const AESByte& b);
 

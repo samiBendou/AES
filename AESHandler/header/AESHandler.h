@@ -26,9 +26,13 @@ public:
 
     mat_aes_t encrypt(const mat_aes_t &plain, const mat_aes_t &key);
 
+    mat_aes_t decrypt(const mat_aes_t &cipher, const mat_aes_t &key);
+
 protected:
 
     AESHandler(uc_t n_b, uc_t n_k, uc_t n_r);
+
+    // ENCRYPTION PROCESS
 
     void addRoundKey();
 
@@ -43,6 +47,14 @@ protected:
     void mixColumns();
 
     void keyExpansion(const mat_aes_t &key);
+
+    // DECRYTION PROCESS
+
+    void invSubBytes(mat_aes_t &block);
+
+    void invShiftRows();
+
+    void invMixColumns();
 
     // MEMBERS
 
@@ -66,7 +78,11 @@ protected:
 
     const static vec_aes_t s_box;
 
+    const static vec_aes_t inv_s_box;
+
     const static mat_aes_t mat_mix_columns;
+
+    const static mat_aes_t inv_mat_mix_columns;
 
     const static mat_aes_t r_con;
 };

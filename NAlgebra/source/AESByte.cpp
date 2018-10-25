@@ -6,15 +6,15 @@
 
 #include "AESByte.h"
 
-AESByte::AESByte(char val) : _val((uc_t) val){
+AESByte::AESByte(char val) : _val((uc_t) val) {
 
 }
 
-AESByte::AESByte(int val) : _val((uc_t) abs(val) % 256){
+AESByte::AESByte(int val) : _val((uc_t) abs(val) % 256) {
 
 }
 
-AESByte::AESByte(double val) : _val(((uc_t) floor(fabs(val))) % 256){
+AESByte::AESByte(double val) : _val(((uc_t) floor(fabs(val))) % 256) {
 
 }
 
@@ -22,22 +22,26 @@ uc_t AESByte::val() const {
     return _val;
 }
 
-void AESByte::xtime() {
-    _val = (_val & (uc_t) 0x80) ? ((_val << 1) ^ (uc_t) 0x1b) : (_val << 1);
-}
-
 void AESByte::add(const AESByte &b) {
     _val ^= b._val;
 }
 
 void AESByte::prod(const AESByte &b) {
-    AESByte copy{*this};
-    for (int k = 0; k < b._val / 2; ++k) {
-        xtime();
+    AESByte copy_this{*this}, copy_b{b}, res, temp;
+
+    while (copy_this != 0x00) {
+        if ((copy_this._val & 0x01) != 0x00) {
+            res += copy_b;
+        }
+
+        temp._val = static_cast<uc_t>(copy_b._val & 0x80);
+        copy_b._val = copy_b._val << 1;
+        if (temp != 0x00) {
+            copy_b = copy_b + 0x1b;
+        }
+        copy_this = copy_this._val >> 1;
     }
-    if(b._val % 2 != 0 && b != 1) {
-        add(copy);
-    }
+    *this = res;
 }
 
 AESByte AESByte::operator+(const AESByte &b) {
@@ -96,11 +100,11 @@ bool operator<=(const AESByte &b1, const AESByte &b2) {
 }
 
 bool operator<(const AESByte &b1, const AESByte &b2) {
-    return  b1._val < b2._val;
+    return b1._val < b2._val;
 }
 
 bool operator>(const AESByte &b1, const AESByte &b2) {
-    return  b1._val > b2._val;
+    return b1._val > b2._val;
 }
 
 bool operator>=(const AESByte &b1, const AESByte &b2) {
