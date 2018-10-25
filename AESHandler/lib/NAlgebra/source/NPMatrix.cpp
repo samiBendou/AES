@@ -66,7 +66,7 @@ NPMatrix<T>::NPMatrix(const NVector<T> &u, ul_t n, ul_t p) : NVector<T>(u),
                                                              _i1(0), _j1(0), _i2(0), _j2(0),
                                                              _a(nullptr), _perm(nullptr) {
 
-    assert(u.dim() == _n * _p);
+    assert(this->dim() == _n * _p);
     setDefaultBrowseIndices();
 }
 

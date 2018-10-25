@@ -3,12 +3,12 @@ project(AESTest)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(NAlgebra/header)
+include_directories(AESHandler/lib/NAlgebra/header)
 include_directories(AESHandler/header)
 
-add_subdirectory(NAlgebra)
 add_subdirectory(AESHandler)
+add_subdirectory(TestAES)
 
-add_executable(AESTest main.cpp)
+add_executable(AES main.cpp)
 
-target_link_libraries(AESTest NAlgebra AESHandler)
+target_link_libraries(AES AESHandler)

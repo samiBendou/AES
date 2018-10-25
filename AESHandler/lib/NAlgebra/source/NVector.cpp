@@ -474,14 +474,14 @@ bool NVector<T>::isValidIndex(ul_t k) const {
 
 template<typename T>
 bool NVector<T>::isNull() const {
-    return norm() < EPSILON;
+    return norm() <= EPSILON;
 }
 
 template<typename T>
 bool NVector<T>::isEqual(const NVector<T> &u) const {
     if (!hasSameSize(u))
         return false;
-    return distance(u) < EPSILON;
+    return distance(u) <= EPSILON;
 }
 
 template<typename T>
@@ -502,7 +502,7 @@ bool NVector<T>::hasDefaultBrowseIndices() const {
 template<typename T>
 void NVector<T>::setDefaultBrowseIndices() const {
     _k1 = 0;
-    _k2 = (this->size() > 0) ? this->size() - 1 : 0;
+    _k2 = (!this->empty()) ? this->size() - 1 : 0;
 }
 
 // AFFECTATION
@@ -528,7 +528,7 @@ void NVector<T>::parse(const std::string &str) {
     string::size_type sz = 1;
     ul_t i = 0;
 
-    assert(str.find(",") == string::npos);
+    assert(str.find(',') == string::npos);
 
     while (i < str.size() && str[i] != ')') {
         try {

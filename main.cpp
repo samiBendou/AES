@@ -1,6 +1,4 @@
 #include <iostream>
-#include <NVector.h>
-#include <NPMatrix.h>
 #include <AESHandler.h>
 
 using namespace std;
@@ -20,8 +18,6 @@ int main() {
                                       0x01, 0x05, 0x09, 0x0d,
                                       0x02, 0x06, 0x0a, 0x0e,
                                       0x03, 0x07, 0x0b, 0x0f}), 4, 4};
-
-    mat_aes_t res;
 
     cout << "*AES128*" << endl;
     cout << "input :" << endl;
