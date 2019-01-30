@@ -1,5 +1,5 @@
 # AES 0.5.0
-C++ interface for AES encryption and decryption. Designed both as useful AES tolbox for production and efficient research tool for cryptanalysis
+C++ interface simple for AES encryption and decryption. Designed both as useful AES tolbox for production and efficient research tool for cryptanalysis
 
 ### Featuring
   - Block encrypt and decrypt tools for AES 126, 192 and 256 bits.
