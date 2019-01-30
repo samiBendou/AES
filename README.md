@@ -38,7 +38,7 @@ mat_aes_t key{
 - Instantiate a handler and call `encrypt()` method :
 ```cpp
 AESHandler hander{};
-mat_aes_t cipher = handler.encrypt(_plain, key128);
+mat_aes_t cipher = handler.encrypt(plain, key);
 ```
 
 #### Decryption
